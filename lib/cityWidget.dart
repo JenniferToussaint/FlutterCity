@@ -8,6 +8,8 @@ import 'package:meteoo/weather.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 
 class MyCityForm extends StatefulWidget {
   const MyCityForm({super.key});
@@ -16,7 +18,21 @@ class MyCityForm extends StatefulWidget {
   MyCityFormState createState() {
     return MyCityFormState();
   }
+
 }
+
+  void initialization() async {
+    // This is where you can initialize the resources needed by your app while
+    // the splash screen is displayed.  Remove the following example because
+    // delaying the user experience is a bad design practice!
+    // ignore_for_file: avoid_print
+    print('ready in 2...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('ready in 1...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('go!');
+    FlutterNativeSplash.remove();
+  }
 
 // Création d'un State correspondant au widget Form
 class MyCityFormState extends State<MyCityForm> {
@@ -25,9 +41,12 @@ class MyCityFormState extends State<MyCityForm> {
   Future<double>? _temperatureFuture;
   Future<String>? _pays;
   Future<LatLng>? _coord;
-
-  // Future<Position>? _localisationUser;
-  Future<String>? _city;
+  
+  @override
+  void initState() {
+    super.initState();
+    initialization();
+  }
 
   @override
   Widget build(BuildContext context) {
