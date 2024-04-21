@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:latlong2/latlong.dart';
 
 class NinjaAPI {
   final Dio _dio = Dio();
@@ -46,7 +47,8 @@ class NinjaAPI {
     }
   }
 
-  Future<List<double>> getCityCoord(String cityName) async {
+
+  Future<LatLng> getCityCoord(String cityName) async {
     try {
       final response = await _dio.get('https://api.api-ninjas.com/v1/city?name=$cityName', 
         options: Options(
@@ -63,9 +65,7 @@ class NinjaAPI {
         var lat = city['latitude'];
         var long = city['longitude'];
 
-        List<double> coord = [long, lat];
-
-        return coord;
+        return  LatLng(lat, long);
 
       } else {
         throw Exception('Failed to load city');
@@ -74,4 +74,5 @@ class NinjaAPI {
       throw Exception('Failed to load city: $e');
     }
   }
+
 }
