@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:meteoo/cityWidget.dart';
+import 'package:meteoo/positionGeo.dart';
 // import 'package:meteoo/ninja.dart';
 // import 'package:meteoo/weather.dart';
 

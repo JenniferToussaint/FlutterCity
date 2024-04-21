@@ -1,9 +1,13 @@
 // Création d'un widget Form
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:meteoo/ninja.dart';
+import 'package:meteoo/positionGeo.dart';
 import 'package:meteoo/weather.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MyCityForm extends StatefulWidget {
   const MyCityForm({super.key});
@@ -21,6 +25,9 @@ class MyCityFormState extends State<MyCityForm> {
   Future<double>? _temperatureFuture;
   Future<String>? _pays;
   Future<LatLng>? _coord;
+
+  // Future<Position>? _localisationUser;
+  Future<String>? _city;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +61,39 @@ class MyCityFormState extends State<MyCityForm> {
                 });
               },
               child: const Text('Envoyer'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Envoie de la requête')),
+                );
+                var geo = PositionGeolocator();
+                var weather = WeatherAPI();
+
+                Position pos = await geo.determinePosition();
+                String city = await weather
+                    .getCityName(LatLng(pos.latitude, pos.longitude));
+
+                city = "Metz"; // auboué ne marche pas avec openwheathermap
+                _controller.text =
+                    city; // met la valeur de la variable city dans la texbox
+
+                // reprends le même code qu'avec une saisie classique
+                setState(() {
+                  var ninja = NinjaAPI();
+                  var weather = WeatherAPI();
+
+                  _coord = ninja.getCityCoord(_controller.text);
+                  _pays = ninja.getCountryName(_controller.text);
+                  _temperatureFuture = ninja
+                      .getCityCoord(_controller.text)
+                      .then((coord) => weather.getTemperatureWeather(coord));
+                });
+              },
+              child: const Text('Par localisation'),
             ),
           ),
           FutureBuilder<double>(
@@ -100,9 +140,8 @@ class MyCityFormState extends State<MyCityForm> {
               } else if (snapshot.hasData && snapshot.data != null) {
                 return FlutterMap(
                   options: MapOptions(
-                    initialCenter: snapshot.data!, // récupère les coordonnées
-                    initialZoom: 5
-                  ),
+                      initialCenter: snapshot.data!, // récupère les coordonnées
+                      initialZoom: 5),
                   children: [
                     TileLayer(
                       urlTemplate:
@@ -114,9 +153,10 @@ class MyCityFormState extends State<MyCityForm> {
                         Marker(
                             width: 80.0,
                             height: 80.0,
-                            point: snapshot.data!, 
+                            point: snapshot.data!,
                             child: const Icon(Icons.location_on,
-                                color: Color.fromARGB(255, 39, 63, 251), size: 60)),
+                                color: Color.fromARGB(255, 39, 63, 251),
+                                size: 60)),
                       ],
                     ),
                   ],
